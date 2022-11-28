@@ -109,16 +109,13 @@ sections:
     # this config defines which type would be the row and what fields would be availabe in `this`
     row-type: system
     columns:
-      - name: nr
-        display-name: № п/п
+      - display-name: № п/п
         # sets the rows auto-numbering
         type: autonumber
-      - name: name
-        # Explicit display-name has higher priority than field type's display name
+      - # Explicit display-name has higher priority than field type's display name
         display-name: Система
         value: this.name
-      - name: components
-        # Without display-name set, display name should be inferred from the bound field's type
+      - # Without display-name set, display name should be inferred from the bound field's type
         # in this case -- metamodel->entities->system->fields->description->display-name
         # display-name: Описание
         value: this.description
