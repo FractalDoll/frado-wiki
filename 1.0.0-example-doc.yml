@@ -28,7 +28,6 @@ metamodel:
         - target:
           type: system
           display-name: Система-приёмник
-          line-end: filled-arrow
       fields:
         - id: 
           type: integer
