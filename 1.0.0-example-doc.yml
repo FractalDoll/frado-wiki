@@ -1,0 +1,157 @@
+schema-version: 1
+kind: smart-doc
+metamodel: 
+  entities:
+    system:
+      display-name: Система
+      fields:
+        - id: 
+          type: integer
+          primary-key: true
+          display-name: Идентификатор
+        - name: 
+          type: string
+          required: true
+          unique: true
+          display-name: Наименование
+        - description: 
+          type: string
+          required: true
+          unique: true
+          display-name: Описание
+  relations:
+    data-flow:
+      ends:
+        - source:
+          type: system
+          display-name: Система-источник
+        - target:
+          type: system
+          display-name: Система-приёмник
+      fields:
+        - id: 
+          type: integer
+          primary-key: true
+          display-name: Идентификатор
+        - name: 
+          type: string
+          display-name: Описание
+        - exchange-method: 
+          type: string
+          display-name: Метод обмена
+        - auth-method: 
+          type: string
+          display-name: Способ аутентификации
+        - flow-purpose:
+          type: string
+          display-name: Описание потока данных
+model:
+  entities:
+    - type: system
+      id: 1
+      name: Фронт
+      description: Осуществляет взаимодействие с пользователем
+    - type: system
+      id: 2
+      name: Бэк
+      description: Отдаёт REST-API фронту
+    - type: system
+      id: 3
+      name: CRM
+      description: Содержит карточки клиентов
+    - type: system
+      id: 4
+      name: Google
+      description: ....
+  relations:
+    - id: 4
+      type: data-flow
+      ends:
+        source: 1
+        target: 2
+      fields:
+        - exchange-method: REST
+        - auth-method: JWT
+        - flow-purpose: Фронт получает с бэка все данные
+    - id: 5
+      type: data-flow
+      ends:
+        source: 2
+        target: 1
+      fields:
+        - exchange-method: WebSocket
+        # field is missing, validation error should be visualized
+        # - auth-method: 
+        - flow-purpose: Бэк отправляет на фронт события методом push
+    - id: 6
+      type: data-flow
+      ends:
+        source: 2
+        target: 3
+      fields:
+        - exchange-method: Kafka
+        - auth-method: TLS Cert
+        - flow-purpose: Бэк отправляет на фронт события методом push
+    - id: 7
+      type: data-flow
+      ends:
+        source: 4
+        target: 3
+      fields: # empty, validation errors should be visualized
+
+sections:
+  - type: markdown
+    value: |
+      # Документ для теста рендеринга
+      ## Таблица с системами
+  - type: table
+    # every table must have an associated collection of homogenous (same type) rows
+    # this config defines which type would be the row and what fields would be availabe in `this`
+    row-type: system
+    columns:
+      - name: nr
+        display-name: № п/п
+        # sets the rows auto-numbering
+        type: autonumber
+      - name: name
+        # Explicit display-name has higher priority than field type's display name
+        display-name: Система
+        value: this.name
+      - name: components
+        # Without display-name set, display name should be inferred from the bound field's type
+        # in this case -- metamodel->entities->system->fields->description->display-name
+        # display-name: Описание
+        value: this.description
+  - type: markdown
+    value: |
+      ## Таблица со связями
+  - type: table
+    row-type: data-flow
+    columns:
+      - type: autonumber
+        display-name: Код потока
+      # when addding new row, we should not add a string value, but somehow select from existing systems
+      # it could be inferred by introspecting row-type's `source` field
+      # which happen to be data-flow->source->type == system, 
+      - value: this.source.name
+        display-name: Система-Инициатор 
+      # we should offer our user to select a system for each of fields bound this way
+      - value: this.target.name
+        display-name: Система-Приёмник
+      - value: this.exchange-method
+      - value: this.auth-method
+      - value: this.description
+  - type: markdown
+    value: |
+      ## Диаграмма 
+      (не должна строиться автоматически! allowed-types влияют на доступные 
+      для создания и переиспользования объекты в панелях с объектами, и на валидацию)
+  - type: diagram
+    allowed-types:
+      - type: system
+      - type: data-flow
+  - type: plantuml # shows a graph of entities and relations; out of scope, to be implemented later
+    types:
+      - type: system
+      - type: data-flow
+

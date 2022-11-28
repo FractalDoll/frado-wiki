@@ -1,0 +1,41 @@
+metamodel:
+  entities:
+    system:
+      fields:
+        - id: integer
+        - name: string
+  relations:
+    kafka-data-flow:
+      ends:
+        - source:
+          type: system
+        - target:
+          type: system
+        - kafka: 
+          type: system
+      fields:
+        - description: 
+          type: string
+        - schema-doc: string
+          type: string
+model:
+  entities:
+    - type: system
+      id: 1
+      name: A
+    - type: system
+      id: 2
+      name: B
+    - type: system
+      id: 3
+      name: Kafka
+  relations:
+    - id: 4
+      type: kafka-data-flow
+      ends:
+        source: 1
+        target: 2
+        kafka: 3
+      fields:
+        - description:  передаёт данные
+        - schema-doc: https://jira.cloud/q/w/e
